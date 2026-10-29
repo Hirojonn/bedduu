@@ -1,0 +1,54 @@
+[
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/drawable_ic_launcher.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/drawable/ic_launcher.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-xxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-xxxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/drawable_elf_peek.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/drawable/elf_peek.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/drawable_splash_icon_transparent.xml.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/drawable/splash_icon_transparent.xml"
+    },
+    {
+        "merged": "com.hirojonn.bedduu.app-debug-56:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.hirojonn.bedduu.app-main-58:/mipmap-xxxhdpi/ic_launcher.png"
+    }
+]

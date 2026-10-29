@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hirojonn.bedduu.data.remote.parser.ComixCatalogParserTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-17T14:22:20" hostname="DESKTOP-MCM7A54" time="0.775">
+  <properties/>
+  <testcase name="parses manga from any initial query response" classname="com.hirojonn.bedduu.data.remote.parser.ComixCatalogParserTest" time="0.767"/>
+  <testcase name="missing page data reports a useful parser error" classname="com.hirojonn.bedduu.data.remote.parser.ComixCatalogParserTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

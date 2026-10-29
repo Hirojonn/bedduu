@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.hirojonn.bedduu.app-mergeDebugResources-53:/values-v31/values-v31.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\Jonn Orada\\.gradle\\caches\\transforms-3\\fde5ae866b9511d96b496e0a92042455\\transformed\\core-splashscreen-1.0.1\\res\\values-v31\\values-v31.xml",
+                    "from": {
+                        "startLines": "2,9",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,473",
+                        "endLines": "8,13",
+                        "endColumns": "12,12",
+                        "endOffsets": "468,697"
+                    }
+                }
+            ]
+        }
+    ]
+}

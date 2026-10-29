@@ -1,0 +1,57 @@
+com.hirojonn.bedduu.app-room-ktx-2.5.0-0 C:\Users\Jonn Orada\.gradle\caches\transforms-3\0404cecdedcdaf48b770eb7936d0bebc\transformed\room-ktx-2.5.0\res
+com.hirojonn.bedduu.app-core-1.12.0-1 C:\Users\Jonn Orada\.gradle\caches\transforms-3\04b5936cf70585fe5227ada488037a2d\transformed\core-1.12.0\res
+com.hirojonn.bedduu.app-emoji2-1.4.0-2 C:\Users\Jonn Orada\.gradle\caches\transforms-3\05121284987d0e15b6bbefcabc6dfd5d\transformed\emoji2-1.4.0\res
+com.hirojonn.bedduu.app-lifecycle-livedata-core-ktx-2.7.0-3 C:\Users\Jonn Orada\.gradle\caches\transforms-3\08e4e705e07370345f85ad94bfe7b1a8\transformed\lifecycle-livedata-core-ktx-2.7.0\res
+com.hirojonn.bedduu.app-sqlite-framework-2.3.0-4 C:\Users\Jonn Orada\.gradle\caches\transforms-3\0a522f3ff235a26fe3f89c657e2f99bc\transformed\sqlite-framework-2.3.0\res
+com.hirojonn.bedduu.app-lifecycle-viewmodel-2.7.0-5 C:\Users\Jonn Orada\.gradle\caches\transforms-3\1a7969319ba623955dc25c21bbc859b1\transformed\lifecycle-viewmodel-2.7.0\res
+com.hirojonn.bedduu.app-annotation-experimental-1.3.0-6 C:\Users\Jonn Orada\.gradle\caches\transforms-3\1eaadbaf2a7c5dddda17526adf3040e3\transformed\annotation-experimental-1.3.0\res
+com.hirojonn.bedduu.app-lifecycle-livedata-2.7.0-7 C:\Users\Jonn Orada\.gradle\caches\transforms-3\3152eab86215f66ff00b025ec38a71e9\transformed\lifecycle-livedata-2.7.0\res
+com.hirojonn.bedduu.app-material-icons-core-release-8 C:\Users\Jonn Orada\.gradle\caches\transforms-3\43208e26d75290d389b9e76576fd74a6\transformed\material-icons-core-release\res
+com.hirojonn.bedduu.app-lifecycle-process-2.7.0-9 C:\Users\Jonn Orada\.gradle\caches\transforms-3\44c22a29cdd479df7121d1c898359b3f\transformed\lifecycle-process-2.7.0\res
+com.hirojonn.bedduu.app-foundation-release-10 C:\Users\Jonn Orada\.gradle\caches\transforms-3\4acb2c4fc93a6cf62980657ef3f565e8\transformed\foundation-release\res
+com.hirojonn.bedduu.app-runtime-saveable-release-11 C:\Users\Jonn Orada\.gradle\caches\transforms-3\4e88d42855cc8730630157f980f15a99\transformed\runtime-saveable-release\res
+com.hirojonn.bedduu.app-lifecycle-viewmodel-ktx-2.7.0-12 C:\Users\Jonn Orada\.gradle\caches\transforms-3\4ee0d9a75d2bcda185a53e0afed5aabd\transformed\lifecycle-viewmodel-ktx-2.7.0\res
+com.hirojonn.bedduu.app-material-ripple-release-13 C:\Users\Jonn Orada\.gradle\caches\transforms-3\5025313818ee1fe13a9018b3aa5446fa\transformed\material-ripple-release\res
+com.hirojonn.bedduu.app-foundation-layout-release-14 C:\Users\Jonn Orada\.gradle\caches\transforms-3\51494a110c5b0a3e585beeb44dae4164\transformed\foundation-layout-release\res
+com.hirojonn.bedduu.app-lifecycle-viewmodel-compose-2.7.0-15 C:\Users\Jonn Orada\.gradle\caches\transforms-3\52cc94f49126726542ae2583f3eb9c8b\transformed\lifecycle-viewmodel-compose-2.7.0\res
+com.hirojonn.bedduu.app-core-ktx-1.12.0-16 C:\Users\Jonn Orada\.gradle\caches\transforms-3\5b239b90d780c16afdc1c7c7635ec8e1\transformed\core-ktx-1.12.0\res
+com.hirojonn.bedduu.app-coil-base-2.5.0-17 C:\Users\Jonn Orada\.gradle\caches\transforms-3\5f036e09614be9c5c7172c6627253e0d\transformed\coil-base-2.5.0\res
+com.hirojonn.bedduu.app-room-runtime-2.5.0-18 C:\Users\Jonn Orada\.gradle\caches\transforms-3\6a40abf8165c2b9dad0e0f9473134fb6\transformed\room-runtime-2.5.0\res
+com.hirojonn.bedduu.app-ui-release-19 C:\Users\Jonn Orada\.gradle\caches\transforms-3\7245d3a7881a8711e67588111dd4afb1\transformed\ui-release\res
+com.hirojonn.bedduu.app-sqlite-2.3.0-20 C:\Users\Jonn Orada\.gradle\caches\transforms-3\72ff30ee83915f6970a7c1af1fe224f1\transformed\sqlite-2.3.0\res
+com.hirojonn.bedduu.app-activity-compose-1.8.2-21 C:\Users\Jonn Orada\.gradle\caches\transforms-3\7413511d308b24a1317aa972c6ebb28c\transformed\activity-compose-1.8.2\res
+com.hirojonn.bedduu.app-ui-unit-release-22 C:\Users\Jonn Orada\.gradle\caches\transforms-3\77bf0346fec779de3f8cfcfbcdc9f276\transformed\ui-unit-release\res
+com.hirojonn.bedduu.app-material-icons-extended-release-23 C:\Users\Jonn Orada\.gradle\caches\transforms-3\7b0af19d891fa93d8cdd7f96e4a256a0\transformed\material-icons-extended-release\res
+com.hirojonn.bedduu.app-runtime-release-24 C:\Users\Jonn Orada\.gradle\caches\transforms-3\84ade8450e13f4c3d1ad872a7de59a3c\transformed\runtime-release\res
+com.hirojonn.bedduu.app-material-release-25 C:\Users\Jonn Orada\.gradle\caches\transforms-3\86894eb6b1d3a2dd34ddc1db4d0d52fa\transformed\material-release\res
+com.hirojonn.bedduu.app-startup-runtime-1.1.1-26 C:\Users\Jonn Orada\.gradle\caches\transforms-3\8a7b5cf0418d3934702138360fa489e4\transformed\startup-runtime-1.1.1\res
+com.hirojonn.bedduu.app-core-runtime-2.2.0-27 C:\Users\Jonn Orada\.gradle\caches\transforms-3\911712ca186cc966f4cd56d73c827562\transformed\core-runtime-2.2.0\res
+com.hirojonn.bedduu.app-ui-tooling-preview-release-28 C:\Users\Jonn Orada\.gradle\caches\transforms-3\95b5ee1360a36e2b5a6c41a9aa881cdd\transformed\ui-tooling-preview-release\res
+com.hirojonn.bedduu.app-animation-release-29 C:\Users\Jonn Orada\.gradle\caches\transforms-3\987569a18f6542ec9f06cb887dae61c5\transformed\animation-release\res
+com.hirojonn.bedduu.app-lifecycle-livedata-core-2.7.0-30 C:\Users\Jonn Orada\.gradle\caches\transforms-3\998b55b9fb7e2bacc2dff3d5c2a7b48a\transformed\lifecycle-livedata-core-2.7.0\res
+com.hirojonn.bedduu.app-profileinstaller-1.3.1-31 C:\Users\Jonn Orada\.gradle\caches\transforms-3\9c1d98cf09ccc3b23d081b4cea596ebf\transformed\profileinstaller-1.3.1\res
+com.hirojonn.bedduu.app-savedstate-ktx-1.2.1-32 C:\Users\Jonn Orada\.gradle\caches\transforms-3\9d65de3bb6e96cce00bdcb6020eb6d8a\transformed\savedstate-ktx-1.2.1\res
+com.hirojonn.bedduu.app-material3-1.1.2-33 C:\Users\Jonn Orada\.gradle\caches\transforms-3\a1cb7f03869db2cb2ffa272786e372aa\transformed\material3-1.1.2\res
+com.hirojonn.bedduu.app-ui-graphics-release-34 C:\Users\Jonn Orada\.gradle\caches\transforms-3\a78fb553443ac2ca1ec07295c6a5b00c\transformed\ui-graphics-release\res
+com.hirojonn.bedduu.app-activity-1.8.2-35 C:\Users\Jonn Orada\.gradle\caches\transforms-3\a799c584a3f324cbfb05fce53c22553a\transformed\activity-1.8.2\res
+com.hirojonn.bedduu.app-animation-core-release-36 C:\Users\Jonn Orada\.gradle\caches\transforms-3\b52093ad1c94b0b7b5dbd7b2e90bceac\transformed\animation-core-release\res
+com.hirojonn.bedduu.app-lifecycle-service-2.7.0-37 C:\Users\Jonn Orada\.gradle\caches\transforms-3\c25ba251b31ad152b7afccfc72b5a9cf\transformed\lifecycle-service-2.7.0\res
+com.hirojonn.bedduu.app-lifecycle-runtime-ktx-2.7.0-38 C:\Users\Jonn Orada\.gradle\caches\transforms-3\c2d714ce60f7348d2751f555453e4a60\transformed\lifecycle-runtime-ktx-2.7.0\res
+com.hirojonn.bedduu.app-savedstate-1.2.1-39 C:\Users\Jonn Orada\.gradle\caches\transforms-3\c48b1701facc5757a9dc45f8317b7358\transformed\savedstate-1.2.1\res
+com.hirojonn.bedduu.app-lifecycle-runtime-2.7.0-40 C:\Users\Jonn Orada\.gradle\caches\transforms-3\c990a3be892b408a4d08833fbe9ed53b\transformed\lifecycle-runtime-2.7.0\res
+com.hirojonn.bedduu.app-work-runtime-ktx-2.9.0-41 C:\Users\Jonn Orada\.gradle\caches\transforms-3\d0dd68c6bedbcb8e73bcf687d0209e9a\transformed\work-runtime-ktx-2.9.0\res
+com.hirojonn.bedduu.app-activity-ktx-1.8.2-42 C:\Users\Jonn Orada\.gradle\caches\transforms-3\d2456d9bf2d7007bd9afad4cbc736c02\transformed\activity-ktx-1.8.2\res
+com.hirojonn.bedduu.app-ui-text-release-43 C:\Users\Jonn Orada\.gradle\caches\transforms-3\d6299ee3b751217018531a45a1d6b592\transformed\ui-text-release\res
+com.hirojonn.bedduu.app-ui-util-release-44 C:\Users\Jonn Orada\.gradle\caches\transforms-3\d747bf0052880238c3d5e9a8b2f2193d\transformed\ui-util-release\res
+com.hirojonn.bedduu.app-customview-poolingcontainer-1.0.0-45 C:\Users\Jonn Orada\.gradle\caches\transforms-3\dcc16a86e36bdeb6da6065a0c0357d72\transformed\customview-poolingcontainer-1.0.0\res
+com.hirojonn.bedduu.app-work-runtime-2.9.0-46 C:\Users\Jonn Orada\.gradle\caches\transforms-3\dd24bc8a33335d0d4dcc4daf96980779\transformed\work-runtime-2.9.0\res
+com.hirojonn.bedduu.app-ui-geometry-release-47 C:\Users\Jonn Orada\.gradle\caches\transforms-3\f863f5dd2bad2f33cf9c9a0f419321d3\transformed\ui-geometry-release\res
+com.hirojonn.bedduu.app-lifecycle-viewmodel-savedstate-2.7.0-48 C:\Users\Jonn Orada\.gradle\caches\transforms-3\fcb2a8bd718f67841681e94a9ac8bb54\transformed\lifecycle-viewmodel-savedstate-2.7.0\res
+com.hirojonn.bedduu.app-core-splashscreen-1.0.1-49 C:\Users\Jonn Orada\.gradle\caches\transforms-3\fde5ae866b9511d96b496e0a92042455\transformed\core-splashscreen-1.0.1\res
+com.hirojonn.bedduu.app-appcompat-resources-1.6.1-50 C:\Users\Jonn Orada\.gradle\caches\transforms-3\fea229d7fd8b87037a866051d42bd83d\transformed\appcompat-resources-1.6.1\res
+com.hirojonn.bedduu.app-resValues-51 D:\bedduu-manhwa\app\build\generated\res\resValues\debug
+com.hirojonn.bedduu.app-packageDebugResources-52 D:\bedduu-manhwa\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.hirojonn.bedduu.app-packageDebugResources-53 D:\bedduu-manhwa\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.hirojonn.bedduu.app-merged_res-54 D:\bedduu-manhwa\app\build\intermediates\merged_res\debug
+com.hirojonn.bedduu.app-debug-55 D:\bedduu-manhwa\app\src\debug\res
+com.hirojonn.bedduu.app-main-56 D:\bedduu-manhwa\app\src\main\res
