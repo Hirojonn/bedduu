@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.LaunchedEffect
@@ -22,12 +23,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import com.hirojonn.bedduu.ui.designsystem.BedduuDisplayFontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hirojonn.bedduu.ui.AppViewModel
 import com.hirojonn.bedduu.ui.theme.*
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import coil.compose.AsyncImage
+import java.io.File
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,9 +47,14 @@ fun ProfileScreen(
     val scrollState = rememberScrollState()
     var showEditProfileDialog by remember { mutableStateOf(false) }
     var editName by remember { mutableStateOf(viewModel.username) }
-    var editAvatarIndex by remember { mutableStateOf(viewModel.userAvatarIndex) }
-
+    val context = LocalContext.current
     val currentAvatar = GLOBAL_AVATARS.getOrElse(viewModel.userAvatarIndex) { GLOBAL_AVATARS[0] }
+    val avatarPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { viewModel.saveAvatar(it, context) }
+    }
+
     LaunchedEffect(scrollToTopSignal) {
         if (scrollToTopSignal > 0) scrollState.animateScrollTo(0)
     }
@@ -65,41 +78,31 @@ fun ProfileScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(16.dp))
-                    Text("Select Avatar", fontSize = 13.sp, color = TextMuted)
-                    Spacer(Modifier.height(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        GLOBAL_AVATARS.forEachIndexed { idx, opt ->
-                            val isSel = idx == editAvatarIndex
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                modifier = Modifier
-                                    .clip(BedduuTokens.ShapeSmall)
-                                    .clickable { editAvatarIndex = idx }
-                                    .padding(2.dp)
-                            ) {
-                                BedduuAvatar(
-                                    avatarIndex = idx,
-                                    size = 40.dp,
-                                    showBorder = isSel
-                                )
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    opt.name.split(" ").first(),
-                                    fontSize = 9.sp,
-                                    color = if (isSel) PrimaryLight else TextMuted
-                                )
+                        ProfileAvatar(viewModel, size = 54.dp)
+                        Spacer(Modifier.width(14.dp))
+                        Column(horizontalAlignment = Alignment.Start) {
+                            Text("Profile photo", fontSize = 13.sp, color = TextMuted)
+                            TextButton(onClick = { avatarPicker.launch("image/*") }) {
+                                Icon(Icons.Default.FileUpload, contentDescription = null)
+                                Spacer(Modifier.width(6.dp))
+                                Text("Upload avatar")
                             }
                         }
+
+                    }
+                    viewModel.avatarUploadError?.let { error ->
+                        Text(error, color = RedAccent, fontSize = 12.sp)
                     }
                 }
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.updateProfile(editName, editAvatarIndex)
+                        viewModel.updateProfile(editName)
                         showEditProfileDialog = false
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor)
@@ -137,6 +140,7 @@ fun ProfileScreen(
             fontSize = 27.sp,
             fontWeight = FontWeight.ExtraBold,
             color = TextMain,
+            fontFamily = BedduuDisplayFontFamily,
             modifier = Modifier.padding(start = 20.dp, top = 4.dp, bottom = 16.dp)
         )
 
@@ -152,10 +156,7 @@ fun ProfileScreen(
                     .fillMaxWidth()
                     .padding(18.dp)
             ) {
-                BedduuAvatar(
-                    avatarIndex = viewModel.userAvatarIndex,
-                    size = 62.dp
-                )
+                ProfileAvatar(viewModel, size = 62.dp)
 
                 Spacer(Modifier.width(16.dp))
 
@@ -167,7 +168,7 @@ fun ProfileScreen(
                         color = TextMain
                     )
                     Text(
-                        text = "${currentAvatar.name} • Active Reader",
+                        text = "${if (viewModel.customAvatarPath != null) "Custom avatar" else currentAvatar.name} • Active Reader",
                         fontSize = 13.sp,
                         color = TextMuted
                     )
@@ -194,7 +195,6 @@ fun ProfileScreen(
                 IconButton(
                     onClick = {
                         editName = viewModel.username
-                        editAvatarIndex = viewModel.userAvatarIndex
                         showEditProfileDialog = true
                     }
                 ) {
@@ -205,6 +205,7 @@ fun ProfileScreen(
                         modifier = Modifier.size(20.dp)
                     )
                 }
+
             }
         }
 
@@ -430,5 +431,31 @@ fun ProfileScreen(
         }
 
         Spacer(Modifier.height(30.dp))
+    }
+}
+
+@Composable
+fun ProfileAvatar(viewModel: AppViewModel, size: androidx.compose.ui.unit.Dp) {
+    val imageFile = viewModel.customAvatarPath?.let(::File)?.takeIf(File::isFile)
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(CircleShape)
+            .border(2.dp, Color.White.copy(alpha = 0.8f), CircleShape)
+    ) {
+        BedduuAvatar(
+            avatarIndex = viewModel.userAvatarIndex,
+            modifier = Modifier.fillMaxSize(),
+            size = size,
+            showBorder = false
+        )
+        if (imageFile != null) {
+            AsyncImage(
+                model = imageFile,
+                contentDescription = "Profile avatar",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }

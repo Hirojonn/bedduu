@@ -1,20 +1,29 @@
 package com.hirojonn.bedduu.ui
 
 import android.app.Application
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
+import android.util.Log
 import android.webkit.WebView
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.util.Calendar
 
 enum class CustomScraperSource(val id: String, val domain: String, val prettyName: String, val logoUrl: String) {
@@ -64,6 +73,12 @@ data class ChapterItem(
     val date: String = ""
 )
 
+data class ChapterUpdate(
+    val manga: MockManga,
+    val chapter: ChapterItem,
+    val detectedAt: Long = System.currentTimeMillis()
+)
+
 data class MockManga(
     val title: String,
     val author: String,
@@ -96,6 +111,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     var isFirstLaunch        by mutableStateOf(prefs.getBoolean("is_first_launch", true))
     var username             by mutableStateOf(prefs.getString("username", "Reader_99") ?: "Reader_99")
     var userAvatarIndex      by mutableStateOf(prefs.getInt("avatar_index", 0))
+    var customAvatarPath     by mutableStateOf(prefs.getString("custom_avatar_path", null))
+        private set
+    var avatarUploadError    by mutableStateOf<String?>(null)
+        private set
     var dailyGoalMinutes     by mutableStateOf(prefs.getInt("daily_goal", 30))
     var weeklyActivity       by mutableStateOf<List<Int>>(loadWeeklyStats())
 
@@ -103,9 +122,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     var isDarkMode           by mutableStateOf(prefs.getBoolean("is_dark_mode", true))
     var pureBlackOled        by mutableStateOf(prefs.getBoolean("pure_black_oled", false))
     var notificationsEnabled by mutableStateOf(prefs.getBoolean("notifications", true))
-    var releaseNotificationsEnabled by mutableStateOf(
-        prefs.getBoolean("release_notifications", false)
-    )
     var highQualityImages    by mutableStateOf(prefs.getBoolean("high_quality", true))
     var autoBookmark         by mutableStateOf(prefs.getBoolean("auto_bookmark", false))
     var showPageNumber       by mutableStateOf(prefs.getBoolean("show_page_number", true))
@@ -128,11 +144,27 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         private set
     var readingHistory       by mutableStateOf(loadMangaList("reading_history"))
         private set
+    var chapterUpdates      by mutableStateOf(loadChapterUpdates())
+        private set
+    var isCheckingChapterUpdates by mutableStateOf(false)
+        private set
+    var chapterUpdateCheckMessage by mutableStateOf<String?>(null)
+        private set
+    private var knownChapterUrlsByManga = loadKnownChapterUrls()
     var lastReadChapterUrls  by mutableStateOf(
         runCatching {
             val type = object : TypeToken<Map<String, String>>() {}.type
             gson.fromJson<Map<String, String>>(
                 prefs.getString("last_read_chapters", null),
+                type
+            ).orEmpty()
+        }.getOrDefault(emptyMap())
+    )
+    var lastReadPageNumbers by mutableStateOf(
+        runCatching {
+            val type = object : TypeToken<Map<String, Int>>() {}.type
+            gson.fromJson<Map<String, Int>>(
+                prefs.getString("last_read_pages", null),
                 type
             ).orEmpty()
         }.getOrDefault(emptyMap())
@@ -185,7 +217,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             putBoolean("is_dark_mode", isDarkMode)
             putBoolean("pure_black_oled", pureBlackOled)
             putBoolean("notifications", notificationsEnabled)
-            putBoolean("release_notifications", releaseNotificationsEnabled)
             putBoolean("high_quality", highQualityImages)
             putBoolean("auto_bookmark", autoBookmark)
             putBoolean("show_page_number", showPageNumber)
@@ -201,12 +232,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             putString("favorite_manga_items", gson.toJson(favoriteMangaItems))
             putString("reading_history", gson.toJson(readingHistory))
             putString("last_read_chapters", gson.toJson(lastReadChapterUrls))
+            putString("last_read_pages", gson.toJson(lastReadPageNumbers))
+            putString("custom_avatar_path", customAvatarPath)
+            putString("chapter_updates", gson.toJson(chapterUpdates))
+            putString("known_chapter_urls", gson.toJson(knownChapterUrlsByManga))
             apply()
         }
     }
 
     init {
         prefs.edit().remove("recent_json").apply()
+        prefs.edit().remove("release_notifications").apply()
+        WorkManager.getInstance(application).cancelUniqueWork("keiyoushi_release_check")
         // If stored stats match previous fake defaults, reset them to zero
         if (weeklyActivity == listOf(25, 40, 15, 60, 35, 75, 50)) {
             resetStatistics()
@@ -289,6 +326,171 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         savePreferences()
     }
 
+    fun updateProfile(name: String) {
+        username = name.ifBlank { "Bendduu Reader" }
+        savePreferences()
+    }
+
+    fun saveAvatar(uri: Uri, context: Context) {
+        avatarUploadError = null
+        viewModelScope.launch {
+            try {
+                val savedPath = withContext(Dispatchers.IO) {
+                    val resolver = context.applicationContext.contentResolver
+                    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
+                        ?: throw IOException("The selected image could not be opened.")
+                    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) {
+                        throw IOException("The selected file is not a supported image.")
+                    }
+
+                    var sampleSize = 1
+                    while (bounds.outWidth / sampleSize > 512 ||
+                        bounds.outHeight / sampleSize > 512
+                    ) {
+                        sampleSize *= 2
+                    }
+                    val options = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+                    val bitmap = resolver.openInputStream(uri)?.use {
+                        BitmapFactory.decodeStream(it, null, options)
+                    } ?: throw IOException("The selected image could not be decoded.")
+
+                    val target = File(context.applicationContext.filesDir, "profile-avatar.jpg")
+                    val temporary = File(context.applicationContext.filesDir, "profile-avatar.tmp")
+                    try {
+                        FileOutputStream(temporary).use { output ->
+                            if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 90, output)) {
+                                throw IOException("The selected image could not be saved.")
+                            }
+                        }
+                    } finally {
+                        bitmap.recycle()
+                    }
+                    if (target.exists() && !target.delete()) {
+                        temporary.delete()
+                        throw IOException("The previous profile image could not be replaced.")
+                    }
+                    if (!temporary.renameTo(target)) {
+                        temporary.delete()
+                        throw IOException("The profile image could not be stored.")
+                    }
+                    target.absolutePath
+                }
+                customAvatarPath = savedPath
+                savePreferences()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (error: Exception) {
+                Log.e("AppViewModel", "Could not save the selected profile image.", error)
+                avatarUploadError = "Could not save image: ${error.message ?: "unsupported image"}"
+            }
+        }
+    }
+
+    suspend fun checkBookmarkedChapterUpdates(context: Context) {
+        if (isCheckingChapterUpdates || bookmarkedManga.isEmpty()) return
+
+        isCheckingChapterUpdates = true
+        chapterUpdateCheckMessage = "Checking bookmarked manga for new chapters…"
+        var checkedCount = 0
+        var failedCount = 0
+        val updatedItems = chapterUpdates.toMutableList()
+        val knownUrls = knownChapterUrlsByManga.toMutableMap()
+        val refreshedMangaByKey = mutableMapOf<String, MockManga>()
+
+        try {
+            for (manga in bookmarkedManga) {
+                val key = mangaKey(manga)
+                try {
+                    val fetched = MangaScraperRepository.fetchChapters(
+                        manga,
+                        context.applicationContext
+                    )
+                    if (fetched.isEmpty()) {
+                        failedCount++
+                        Log.w("AppViewModel", "No chapters returned while checking ${manga.title}.")
+                        continue
+                    }
+
+                    checkedCount++
+                    val priorUrls = knownUrls[key]
+                        ?: manga.chapters.map { chapterUrlKey(it.url) }.toList()
+                    val newChapters = if (priorUrls.isEmpty() && manga.chapters.isEmpty()) {
+                        emptyList()
+                    } else {
+                        fetched.filter { chapterUrlKey(it.url) !in priorUrls }
+                    }
+
+                    val refreshedManga = manga.copy(
+                        chapters = (fetched + manga.chapters)
+                            .distinctBy { chapterUrlKey(it.url) }
+                    )
+                    refreshedMangaByKey[key] = refreshedManga
+                    newChapters.filterNot { chapter ->
+                        updatedItems.any {
+                            mangaKey(it.manga) == key &&
+                                chapterUrlKey(it.chapter.url) == chapterUrlKey(chapter.url)
+                        }
+                    }.forEach { chapter ->
+                        updatedItems.add(
+                            0,
+                            ChapterUpdate(manga = refreshedManga, chapter = chapter)
+                        )
+                    }
+                    knownUrls[key] = (fetched + manga.chapters)
+                        .map { chapterUrlKey(it.url) }
+                        .distinct()
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (error: Exception) {
+                    failedCount++
+                    Log.w("AppViewModel", "Could not check chapters for ${manga.title}.", error)
+                }
+            }
+
+            chapterUpdates = updatedItems
+            knownChapterUrlsByManga = knownUrls
+            bookmarkedManga = bookmarkedManga.map { manga ->
+                refreshedMangaByKey[mangaKey(manga)] ?: manga
+            }
+            savePreferences()
+            chapterUpdateCheckMessage = when {
+                failedCount > 0 ->
+                    "Checked $checkedCount of ${bookmarkedManga.size} bookmarks; $failedCount could not be checked."
+                checkedCount > 0 ->
+                    "Checked $checkedCount bookmarked manga. ${chapterUpdates.size} new chapter updates."
+                else -> "No bookmarked manga could be checked."
+            }
+        } finally {
+            isCheckingChapterUpdates = false
+        }
+    }
+
+    fun clearChapterUpdates() {
+        chapterUpdates = emptyList()
+        savePreferences()
+    }
+
+    private fun chapterUrlKey(url: String): String = url.substringBefore('#').trimEnd('/')
+
+    private fun loadKnownChapterUrls(): Map<String, List<String>> =
+        runCatching {
+            val type = object : TypeToken<Map<String, List<String>>>() {}.type
+            gson.fromJson<Map<String, List<String>>>(
+                prefs.getString("known_chapter_urls", null),
+                type
+            ).orEmpty()
+        }.getOrDefault(emptyMap())
+
+    private fun loadChapterUpdates(): List<ChapterUpdate> =
+        runCatching {
+            val type = object : TypeToken<List<ChapterUpdate>>() {}.type
+            gson.fromJson<List<ChapterUpdate>>(
+                prefs.getString("chapter_updates", null),
+                type
+            ).orEmpty()
+        }.getOrDefault(emptyList())
+
     // ─── Actions ──────────────────────────────────────────────────────────
 
     fun bookmarkManga(
@@ -334,6 +536,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun removeBookmark(manga: MockManga) {
         bookmarkedManga = bookmarkedManga.filter { it.title != manga.title }
+        chapterUpdates = chapterUpdates.filterNot { mangaKey(it.manga) == mangaKey(manga) }
+        knownChapterUrlsByManga = knownChapterUrlsByManga - mangaKey(manga)
         savePreferences()
     }
 
@@ -412,6 +616,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearAllBookmarks() {
         bookmarkedManga = emptyList()
+        chapterUpdates = emptyList()
+        knownChapterUrlsByManga = emptyMap()
         savePreferences()
     }
 
@@ -438,6 +644,19 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         savePreferences()
     }
+
+    fun lastReadPage(manga: MockManga, chapter: ChapterItem): Int? =
+        lastReadPageNumbers[chapterProgressKey(manga, chapter)]
+
+    fun recordReadPage(manga: MockManga, chapter: ChapterItem, page: Int) {
+        if (chapter.url.isBlank()) return
+        lastReadPageNumbers = lastReadPageNumbers +
+            (chapterProgressKey(manga, chapter) to page.coerceAtLeast(1))
+        savePreferences()
+    }
+
+    private fun chapterProgressKey(manga: MockManga, chapter: ChapterItem): String =
+        "${mangaKey(manga)}\u0000${chapter.url}"
 
     private fun mangaKey(manga: MockManga): String =
         manga.sourceUrl.ifBlank { manga.title.lowercase() }

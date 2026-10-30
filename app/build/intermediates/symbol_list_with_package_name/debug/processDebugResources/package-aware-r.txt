@@ -93,6 +93,7 @@ drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
 drawable splash_icon_transparent
+font bangers
 id accessibility_action_clickable_span
 id accessibility_custom_action_0
 id accessibility_custom_action_1
@@ -197,6 +198,9 @@ layout splash_screen_view
 mipmap ic_launcher
 mipmap ic_launcher_round
 string about_description
+string about_font_credit
+string about_sources_description
+string about_terms_body
 string androidx_startup
 string app_name
 string bottom_sheet_collapse_description
@@ -258,7 +262,6 @@ string details_chapters_load_failed
 string details_chapters_title
 string details_chapters_unavailable
 string details_continue
-string details_continue_chapter
 string details_date_unknown
 string details_description
 string details_description_unavailable
@@ -271,11 +274,14 @@ string details_open_source
 string details_percent
 string details_progress_not_started
 string details_progress_started
+string details_resume_chapter
+string details_resume_chapter_page
 string details_retry
 string details_scanlation_group
 string details_share
 string details_share_chooser
 string details_source_unknown
+string details_start_chapter
 string details_status_source
 string details_status_unknown
 string details_tags_unavailable

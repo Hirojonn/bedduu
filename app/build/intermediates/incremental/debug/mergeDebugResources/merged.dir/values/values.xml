@@ -127,6 +127,9 @@
     <integer name="default_icon_animation_duration">10000</integer>
     <integer name="status_bar_notification_info_maxnum">999</integer>
     <string name="about_description">Bedduu helps readers discover and read manga from available online sources. Manga titles, images, and chapters are provided by their respective websites; availability and rights remain with those sources and their owners.</string>
+    <string name="about_font_credit">The app uses Bangers, a comic-style font distributed under the SIL Open Font License 1.1.</string>
+    <string name="about_sources_description">These third-party websites are currently integrated as browsing sources. Selecting one opens its website; each source is responsible for its own content and policies.</string>
+    <string name="about_terms_body">Bedduu does not host or own third-party manga, cover art, chapter images, or translations. Content availability is controlled by the linked websites and may change. Use each source in accordance with its terms, applicable laws, and rights-holder policies. Bedduu is independent and is not affiliated with the listed sources.</string>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
     <string name="app_name">bedduu</string>
     <string name="bottom_sheet_collapse_description">Collapse bottom sheet</string>
@@ -192,7 +195,6 @@
     <string name="details_chapters_title">Chapters</string>
     <string name="details_chapters_unavailable">No chapter links are available yet.</string>
     <string name="details_continue">Continue reading</string>
-    <string name="details_continue_chapter">Continue %1$s</string>
     <string name="details_date_unknown">Date unavailable</string>
     <string name="details_description">Description</string>
     <string name="details_description_unavailable">No description available yet.</string>
@@ -205,11 +207,14 @@
     <string name="details_percent">%1$d%%</string>
     <string name="details_progress_not_started">%1$d chapters available</string>
     <string name="details_progress_started">%1$s of %2$s · %3$s left</string>
+    <string name="details_resume_chapter">Resume %1$s</string>
+    <string name="details_resume_chapter_page">Resume %1$s · Page %2$d</string>
     <string name="details_retry">Retry chapter lookup</string>
     <string name="details_scanlation_group">Scanlation group</string>
     <string name="details_share">Share manga</string>
     <string name="details_share_chooser">Share manga</string>
     <string name="details_source_unknown">SOURCE</string>
+    <string name="details_start_chapter">Start reading %1$s</string>
     <string name="details_status_source">%1$s · %2$s</string>
     <string name="details_status_unknown">MANGA</string>
     <string name="details_tags_unavailable">Genres unavailable</string>

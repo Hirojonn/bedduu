@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import com.hirojonn.bedduu.R
 import com.hirojonn.bedduu.ui.AppViewModel
 import com.hirojonn.bedduu.ui.theme.*
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,10 +38,16 @@ fun OnboardingScreen(
     onFinished: () -> Unit
 ) {
     var usernameInput by remember { mutableStateOf("") }
-    var selectedAvatarIndex by remember { mutableStateOf(0) }
     var selectedReadingMode by remember { mutableStateOf("webtoon") }
     var pureBlackOled by remember { mutableStateOf(false) }
     var highQuality by remember { mutableStateOf(true) }
+
+    val context = LocalContext.current
+    val avatarPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { viewModel.saveAvatar(it, context) }
+    }
 
     val scrollState = rememberScrollState()
 
@@ -123,46 +133,39 @@ fun OnboardingScreen(
 
         Spacer(Modifier.height(18.dp))
 
-        // ── 2. Choose Avatar (Zero Emojis, Pure Anime Vector Archetypes) ───
+        // ── 2. Upload profile photo ────────────────────────────────────────
         BedduuCard(
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(18.dp)) {
-                Text(
-                    "Choose Profile Avatar",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = TextMain
-                )
-                Spacer(Modifier.height(14.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    GLOBAL_AVATARS.forEachIndexed { index, option ->
-                        val isSelected = index == selectedAvatarIndex
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .clip(BedduuTokens.ShapeSmall)
-                                .clickable { selectedAvatarIndex = index }
-                                .padding(2.dp)
-                        ) {
-                            BedduuAvatar(
-                                avatarIndex = index,
-                                size = 44.dp,
-                                showBorder = isSelected
-                            )
-                            Spacer(Modifier.height(6.dp))
-                            Text(
-                                option.name.split(" ").first(),
-                                fontSize = 10.sp,
-                                color = if (isSelected) PrimaryLight else TextMuted,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                            )
-                        }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ProfileAvatar(viewModel, size = 52.dp)
+                Spacer(Modifier.width(14.dp))
+                Column {
+                    Text(
+                        "Profile photo",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TextMain
+                    )
+                    TextButton(onClick = { avatarPicker.launch("image/*") }) {
+                        Icon(Icons.Default.FileUpload, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Upload avatar")
                     }
                 }
+            }
+            viewModel.avatarUploadError?.let { error ->
+                Text(
+                    error,
+                    color = RedAccent,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 18.dp, end = 18.dp, bottom = 12.dp)
+                )
             }
         }
 
@@ -271,7 +274,7 @@ fun OnboardingScreen(
             onClick = {
                 viewModel.completeOnboarding(
                     name = usernameInput,
-                    avatar = selectedAvatarIndex,
+                    avatar = 0,
                     mode = selectedReadingMode,
                     oled = pureBlackOled,
                     quality = highQuality

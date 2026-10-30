@@ -97,6 +97,20 @@ private val DetailSecondary: Color
 private val DetailMuted: Color
     @Composable get() = TextMuted
 
+private val chapterNumberPattern =
+    Regex("""(?:chapter|ch\.?)\s*#?\s*(\d+(?:\.\d+)?)""", RegexOption.IGNORE_CASE)
+
+private fun chapterNumber(chapter: ChapterItem): java.math.BigDecimal? =
+    chapterNumberPattern.find(chapter.title)
+        ?.groupValues
+        ?.getOrNull(1)
+        ?.toBigDecimalOrNull()
+
+internal fun firstReadingChapter(chapters: List<ChapterItem>): ChapterItem? =
+    chapters.mapNotNull { chapter ->
+        chapterNumber(chapter)?.let { it to chapter }
+    }.minByOrNull { it.first }?.second ?: chapters.lastOrNull()
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MangaDetailsScreen(
@@ -129,9 +143,18 @@ fun MangaDetailsScreen(
         .filter { selectedUploader == null || it.uploader == selectedUploader }
     val lastReadUrl = viewModel.lastReadChapterUrls[mangaKey]
     val lastReadIndex = chapters.indexOfFirst { it.url == lastReadUrl }
-    val currentChapter = chapters.getOrNull(lastReadIndex) ?: chapters.firstOrNull()
-    val readCount = (lastReadIndex + 1).coerceAtLeast(0)
-    val progress = if (chapters.isEmpty() || lastReadIndex < 0) {
+    val currentChapter = chapters.getOrNull(lastReadIndex) ?: firstReadingChapter(chapters)
+    val resumePage = currentChapter?.let { viewModel.lastReadPage(manga, it) }
+    val readCount = if (lastReadIndex < 0) {
+        0
+    } else {
+        chapterNumber(chapters[lastReadIndex])?.let { lastReadNumber ->
+            chapters.count { chapter ->
+                chapterNumber(chapter)?.let { it <= lastReadNumber } == true
+            }
+        } ?: (chapters.size - lastReadIndex)
+    }
+    val progress = if (chapters.isEmpty() || readCount == 0) {
         0f
     } else {
         readCount.toFloat() / chapters.size
@@ -170,7 +193,6 @@ fun MangaDetailsScreen(
                 onLanguageSelected = viewModel::setDetailsLanguage,
                 onUploaderSelected = viewModel::setDetailsUploader,
                 onChapterSelected = { chapter ->
-                    viewModel.readChapter(manga, chapter)
                     onReadChapter(manga.copy(chapters = chapters), chapter)
                 },
                 loading = viewModel.isLoadingDetails,
@@ -294,9 +316,20 @@ fun MangaDetailsScreen(
                         MangaDetailActions(
                         continueLabel = when {
                             currentChapter != null && lastReadIndex >= 0 ->
-                                stringResource(R.string.details_continue_chapter, currentChapter.title)
+                                if (resumePage != null) {
+                                    stringResource(
+                                        R.string.details_resume_chapter_page,
+                                        currentChapter.title,
+                                        resumePage
+                                    )
+                                } else {
+                                    stringResource(
+                                        R.string.details_resume_chapter,
+                                        currentChapter.title
+                                    )
+                                }
                             currentChapter != null ->
-                                stringResource(R.string.details_continue_chapter, currentChapter.title)
+                                stringResource(R.string.details_start_chapter, currentChapter.title)
                             else -> stringResource(R.string.details_continue)
                         },
                         canContinue = currentChapter != null,
@@ -304,7 +337,6 @@ fun MangaDetailsScreen(
                         isBookmarked = isBookmarked,
                         onContinue = {
                             currentChapter?.let { chapter ->
-                                viewModel.readChapter(manga, chapter)
                                 onReadChapter(manga.copy(chapters = chapters), chapter)
                             }
                         },

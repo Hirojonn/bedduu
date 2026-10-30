@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hirojonn.bedduu.data.remote.parser.MadaraParserTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-30T06:59:29" hostname="DESKTOP-JPOUDNF" time="0.032">
+  <properties/>
+  <testcase name="malformed html with no chapter selector reports layout change" classname="com.hirojonn.bedduu.data.remote.parser.MadaraParserTest" time="0.004"/>
+  <testcase name="preserves chapter order extracts numbering and skips incomplete entries" classname="com.hirojonn.bedduu.data.remote.parser.MadaraParserTest" time="0.028"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

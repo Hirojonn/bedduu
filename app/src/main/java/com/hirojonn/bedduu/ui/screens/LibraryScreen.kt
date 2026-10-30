@@ -7,6 +7,8 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -18,6 +20,7 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,9 +30,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import com.hirojonn.bedduu.ui.designsystem.BedduuDisplayFontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 import com.hirojonn.bedduu.ui.components.CoverArt
 import com.hirojonn.bedduu.ui.AppViewModel
 import com.hirojonn.bedduu.ui.MockManga
@@ -44,15 +50,19 @@ fun LibraryScreen(
 ) {
     var selectedShelf by remember { mutableStateOf("Saved") }
     val gridState = rememberLazyGridState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     LaunchedEffect(scrollToTopSignal) {
         if (scrollToTopSignal > 0 && gridState.layoutInfo.totalItemsCount > 0) {
             gridState.animateScrollToItem(0)
         }
     }
+    val isUpdatesShelf = selectedShelf == "Updates"
     val shelfItems = when (selectedShelf) {
         "Favorites" -> viewModel.favoriteMangaItems
         "History" -> viewModel.readingHistory
         "Downloads" -> emptyList()
+        "Updates" -> emptyList()
         else -> viewModel.bookmarkedManga
     }
 
@@ -82,7 +92,8 @@ fun LibraryScreen(
                     "My Library",
                     fontSize = 27.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = TextMain
+                    color = TextMain,
+                    fontFamily = BedduuDisplayFontFamily
                 )
             }
             Surface(
@@ -103,16 +114,25 @@ fun LibraryScreen(
                 .padding(horizontal = 20.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            listOf("Saved", "Favorites", "History", "Downloads").forEach { shelf ->
+            listOf("Saved", "Favorites", "History", "Downloads", "Updates").forEach { shelf ->
                 FilterChip(
                     selected = selectedShelf == shelf,
                     onClick = { selectedShelf = shelf },
-                    label = { Text(shelf) },
+                    label = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(shelf)
+                            if (shelf == "Updates" && viewModel.chapterUpdates.isNotEmpty()) {
+                                Spacer(Modifier.width(6.dp))
+                                Badge { Text(viewModel.chapterUpdates.size.toString()) }
+                            }
+                        }
+                    },
                     leadingIcon = {
                         when (shelf) {
                             "Favorites" -> Icon(Icons.Outlined.FavoriteBorder, contentDescription = null)
                             "History" -> Icon(Icons.Outlined.History, contentDescription = null)
                             "Downloads" -> Icon(Icons.Outlined.Download, contentDescription = null)
+                            "Updates" -> Icon(Icons.Default.Refresh, contentDescription = null)
                             else -> Icon(Icons.Default.Bookmark, contentDescription = null)
                         }
                     },
@@ -121,7 +141,104 @@ fun LibraryScreen(
             }
         }
 
-        if (shelfItems.isEmpty()) {
+        if (isUpdatesShelf) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        viewModel.chapterUpdateCheckMessage
+                            ?: "New chapters from your saved manga appear here.",
+                        color = TextMuted,
+                        fontSize = 12.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(
+                        enabled = !viewModel.isCheckingChapterUpdates,
+                        onClick = {
+                            scope.launch {
+                                viewModel.checkBookmarkedChapterUpdates(context.applicationContext)
+                            }
+                        }
+                    ) {
+                        if (viewModel.isCheckingChapterUpdates) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = PrimaryLight
+                            )
+                        } else {
+                            Icon(Icons.Default.Refresh, contentDescription = "Check for updates", tint = PrimaryLight)
+                        }
+                    }
+                    if (viewModel.chapterUpdates.isNotEmpty()) {
+                        TextButton(onClick = viewModel::clearChapterUpdates) {
+                            Text("Clear", color = PrimaryLight)
+                        }
+                    }
+                }
+
+                if (viewModel.chapterUpdates.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BedduuEmptyState(
+                            icon = Icons.Default.Refresh,
+                            title = if (viewModel.isCheckingChapterUpdates) "Checking your library" else "No new chapters",
+                            description = viewModel.chapterUpdateCheckMessage
+                                ?: "We'll check your bookmarks when you open the app."
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(bottom = 112.dp)
+                    ) {
+                        items(
+                            items = viewModel.chapterUpdates,
+                            key = { "${it.manga.sourceUrl}:${it.chapter.url}" }
+                        ) { update ->
+                            Card(
+                                onClick = { onMangaClick(update.manga) },
+                                colors = CardDefaults.cardColors(containerColor = BedduuTokens.GlassSurface),
+                                shape = BedduuTokens.ShapeSmall
+                            ) {
+                                Column(Modifier.fillMaxWidth().padding(14.dp)) {
+                                    Text(
+                                        update.manga.title,
+                                        color = TextMain,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(update.chapter.title, color = PrimaryLight, fontSize = 13.sp)
+                                    val detail = listOfNotNull(
+                                        update.chapter.uploader?.takeIf(String::isNotBlank),
+                                        update.chapter.language.takeIf(String::isNotBlank),
+                                        update.chapter.date.takeIf(String::isNotBlank)
+                                    ).joinToString(" • ")
+                                    if (detail.isNotBlank()) {
+                                        Spacer(Modifier.height(3.dp))
+                                        Text(detail, color = TextMuted, fontSize = 11.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (shelfItems.isEmpty()) {
             Box(
                 modifier = Modifier
                     .weight(1f)

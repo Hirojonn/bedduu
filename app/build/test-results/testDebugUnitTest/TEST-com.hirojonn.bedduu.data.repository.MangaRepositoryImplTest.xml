@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hirojonn.bedduu.data.repository.MangaRepositoryImplTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-30T06:59:29" hostname="DESKTOP-JPOUDNF" time="0.383">
+  <properties/>
+  <testcase name="unknown source fails explicitly" classname="com.hirojonn.bedduu.data.repository.MangaRepositoryImplTest" time="0.368"/>
+  <testcase name="wraps timeout as a source network failure" classname="com.hirojonn.bedduu.data.repository.MangaRepositoryImplTest" time="0.008"/>
+  <testcase name="preserves an empty successful response" classname="com.hirojonn.bedduu.data.repository.MangaRepositoryImplTest" time="0.003"/>
+  <testcase name="returns source results" classname="com.hirojonn.bedduu.data.repository.MangaRepositoryImplTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

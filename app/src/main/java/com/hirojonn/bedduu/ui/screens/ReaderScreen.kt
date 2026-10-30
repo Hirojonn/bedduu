@@ -71,6 +71,7 @@ import com.hirojonn.bedduu.ui.theme.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
@@ -108,8 +109,15 @@ fun ReaderScreen(
     var attemptedContinuousChapters by remember(manga.sourceUrl) { mutableStateOf<Set<String>>(emptySet()) }
     var isLoadingNextChapter by remember { mutableStateOf(false) }
     var visibleChapter by remember(chapter.url) { mutableStateOf(chapter) }
+    var visiblePage by remember(chapter.url) {
+        mutableIntStateOf(viewModel.lastReadPage(manga, chapter) ?: 1)
+    }
+    var readerContentAvailable by remember(chapter.url) { mutableStateOf(false) }
+    var webPageFailed by remember(chapter.url) { mutableStateOf(false) }
+    var recordedChapterUrls by remember(manga.sourceUrl) { mutableStateOf<Set<String>>(emptySet()) }
+    var restoredReadingPositions by remember(manga.sourceUrl) { mutableStateOf<Set<String>>(emptySet()) }
     val readerListState = rememberLazyListState()
-    val pagerState = rememberPagerState(pageCount = { extractedImages.size })
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { extractedImages.size })
     var useNativeViewer by remember { mutableStateOf(true) }
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -158,15 +166,95 @@ fun ReaderScreen(
 
     val lastContinuousChapter = continuousPanels.lastOrNull()?.chapter ?: chapter
     val nextContinuousChapter = findNextContinuousChapter(manga.chapters, lastContinuousChapter)
-    LaunchedEffect(readerListState, continuousPanels.size) {
+    LaunchedEffect(
+        readerListState,
+        continuousPanels.size,
+        readerContentAvailable,
+        useNativeViewer,
+        viewModel.readingMode
+    ) {
         snapshotFlow {
             readerListState.layoutInfo.visibleItemsInfo
                 .firstOrNull()
                 ?.index
-                ?.let(continuousPanels::getOrNull)
-                ?.chapter
-        }.collect { currentVisibleChapter ->
-            if (currentVisibleChapter != null) visibleChapter = currentVisibleChapter
+                ?.let { index ->
+                    continuousPanels.getOrNull(index)?.let { panel ->
+                        val page = continuousPanels
+                            .take(index + 1)
+                            .count { it.chapter.url == panel.chapter.url }
+                            .coerceAtLeast(1)
+                        panel.chapter to page
+                    }
+                }
+        }.collectLatest { position ->
+            if (position != null) {
+                val (currentChapter, page) = position
+                visibleChapter = currentChapter
+                visiblePage = page
+                if (
+                    readerContentAvailable &&
+                    useNativeViewer &&
+                    viewModel.readingMode == "webtoon"
+                ) {
+                    delay(350)
+                    if (visibleChapter.url == currentChapter.url && visiblePage == page) {
+                        viewModel.recordReadPage(manga, currentChapter, page)
+                    }
+                }
+            }
+        }
+    }
+    LaunchedEffect(
+        chapter.url,
+        continuousPanels.size,
+        readerContentAvailable,
+        useNativeViewer,
+        viewModel.readingMode
+    ) {
+        if (
+            !readerContentAvailable ||
+            !useNativeViewer ||
+            viewModel.readingMode != "webtoon" ||
+            chapter.url in restoredReadingPositions ||
+            continuousPanels.isEmpty()
+        ) {
+            return@LaunchedEffect
+        }
+        val chapterStartIndex = continuousPanels.indexOfFirst { it.chapter.url == chapter.url }
+        if (chapterStartIndex >= 0) {
+            val savedPanelIndex = (viewModel.lastReadPage(manga, chapter) ?: 1) - 1
+            readerListState.scrollToItem(
+                (chapterStartIndex + savedPanelIndex).coerceIn(0, continuousPanels.lastIndex)
+            )
+            restoredReadingPositions = restoredReadingPositions + chapter.url
+        }
+    }
+    LaunchedEffect(chapter.url, extractedImages.size, useNativeViewer) {
+        if (useNativeViewer && extractedImages.isNotEmpty() && viewModel.readingMode != "webtoon") {
+            val savedPage = viewModel.lastReadPage(manga, chapter)
+            val targetPage = (savedPage?.minus(1) ?: 0).coerceIn(0, extractedImages.lastIndex)
+            pagerState.scrollToPage(targetPage)
+        }
+    }
+    LaunchedEffect(pagerState, chapter.url, readerContentAvailable, useNativeViewer, viewModel.readingMode) {
+        if (!readerContentAvailable || !useNativeViewer || viewModel.readingMode == "webtoon") {
+            return@LaunchedEffect
+        }
+        snapshotFlow { pagerState.currentPage + 1 }.collectLatest { page ->
+            visiblePage = page
+            delay(350)
+            if (visiblePage == page) viewModel.recordReadPage(manga, chapter, page)
+        }
+    }
+    LaunchedEffect(visibleChapter, readerContentAvailable) {
+        val chapterToRecord = visibleChapter
+        if (
+            readerContentAvailable &&
+            chapterToRecord.url.isNotBlank() &&
+            chapterToRecord.url !in recordedChapterUrls
+        ) {
+            recordedChapterUrls = recordedChapterUrls + chapterToRecord.url
+            viewModel.readChapter(manga, chapterToRecord)
         }
     }
 
@@ -298,6 +386,8 @@ fun ReaderScreen(
         attemptedContinuousChapters = setOf(chapter.url)
         isLoadingNextChapter = false
         visibleChapter = chapter
+        readerContentAvailable = false
+        webPageFailed = false
 
         if (targetUrl.isNotBlank()) {
             val directPanels = try {
@@ -312,6 +402,7 @@ fun ReaderScreen(
                 continuousPanels = directPanels.map { ReaderPanel(it, chapter) }
                 useNativeViewer = true
                 isLoading = false
+                readerContentAvailable = true
             } else {
                 // If direct extraction returned no images, fallback to web reader
                 useNativeViewer = false
@@ -369,6 +460,7 @@ fun ReaderScreen(
                             extractedImages = list
                             continuousPanels = list.map { ReaderPanel(it, chapter) }
                             useNativeViewer = true
+                            readerContentAvailable = true
                         } else if (isComixChapter) {
                             useNativeViewer = false
                         }
@@ -611,6 +703,7 @@ fun ReaderScreen(
                                 isLoading = true
                                 webError = null
                                 challengeNotice = false
+                                webPageFailed = false
                                 startReaderLoadTimeout()
                             }
 
@@ -631,6 +724,7 @@ fun ReaderScreen(
                                 if (request?.isForMainFrame == true) {
                                     clearReaderLoadTimeout()
                                     isLoading = false
+                                    webPageFailed = true
                                     webError = error?.description?.toString()
                                         ?: "The chapter page could not be loaded."
                                 }
@@ -646,6 +740,7 @@ fun ReaderScreen(
                                 ) {
                                     clearReaderLoadTimeout()
                                     isLoading = false
+                                    webPageFailed = true
                                     if (errorResponse?.statusCode == 403) {
                                         webError = null
                                         challengeNotice = true
@@ -659,6 +754,7 @@ fun ReaderScreen(
                                 clearReaderLoadTimeout()
                                 handler?.cancel()
                                 isLoading = false
+                                webPageFailed = true
                                 webError = "The source has an invalid security certificate. The connection was stopped."
                             }
 
@@ -669,6 +765,8 @@ fun ReaderScreen(
                                 if (isComixChapter) {
                                     isLoading = true
                                     startReaderLoadTimeout()
+                                } else if (!webPageFailed && !challengeNotice) {
+                                    readerContentAvailable = true
                                 }
                                 // Gentle styling and image extraction
                                 val cleanScript = """
@@ -904,8 +1002,11 @@ fun ReaderScreen(
                     if (viewModel.showPageNumber && viewModel.readingMode == "webtoon" &&
                         continuousPanels.isNotEmpty()
                     ) {
+                        val chapterPanelCount = continuousPanels.count {
+                            it.chapter.url == visibleChapter.url
+                        }
                         Text(
-                            text = "${readerListState.firstVisibleItemIndex + 1} / ${continuousPanels.size}",
+                            text = "$visiblePage / $chapterPanelCount",
                             color = Color.White,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold
@@ -984,7 +1085,6 @@ fun ReaderScreen(
             Surface(
                 color = Color(0xA61B1B2A),
                 shape = CircleShape,
-                shadowElevation = 18.dp,
                 border = BorderStroke(1.dp, Color.White.copy(alpha = 0.08f)),
                 modifier = Modifier
                     .fillMaxWidth(if (showControls) 0.94f else 0.76f)

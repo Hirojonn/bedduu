@@ -11,6 +11,8 @@ import androidx.compose.ui.text.googlefonts.Font as GoogleFontResource
 import androidx.compose.ui.unit.sp
 import com.hirojonn.bedduu.R
 
+val BedduuDisplayFontFamily = FontFamily(Font(R.font.bangers))
+
 @Composable
 fun bedduuTypography(): Typography {
     val provider = Provider(

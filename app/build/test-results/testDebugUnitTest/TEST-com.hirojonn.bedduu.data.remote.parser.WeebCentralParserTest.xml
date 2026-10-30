@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hirojonn.bedduu.data.remote.parser.WeebCentralParserTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-30T06:59:29" hostname="DESKTOP-JPOUDNF" time="0.011">
+  <properties/>
+  <testcase name="layout change and empty html produce a clear parser error" classname="com.hirojonn.bedduu.data.remote.parser.WeebCentralParserTest" time="0.004"/>
+  <testcase name="parses titles and lazy cover urls from saved home page" classname="com.hirojonn.bedduu.data.remote.parser.WeebCentralParserTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

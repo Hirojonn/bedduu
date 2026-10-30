@@ -30,6 +30,7 @@ import com.hirojonn.bedduu.ui.theme.*
 
 private enum class AppScreen {
     ONBOARDING,
+    ABOUT,
     READER,
     BROWSER,
     MANGA_DETAILS,
@@ -62,9 +63,11 @@ fun MangaReaderApp(viewModel: AppViewModel) {
     var readingManga by remember { mutableStateOf<MockManga?>(null) }
     var readingChapter by remember { mutableStateOf<ChapterItem?>(null) }
     var selectedManga by remember { mutableStateOf<MockManga?>(null) }
+    var showingAbout by rememberSaveable { mutableStateOf(false) }
     var isBackNavigation by remember { mutableStateOf(false) }
 
-    val hasPreviousDestination = readingManga != null ||
+    val hasPreviousDestination = showingAbout ||
+        readingManga != null ||
         selectedManga != null ||
         viewModel.selectedCatalogSource != null ||
         viewModel.currentBrowserUrl != null ||
@@ -74,6 +77,7 @@ fun MangaReaderApp(viewModel: AppViewModel) {
     fun returnToPreviousDestination() {
         isBackNavigation = true
         when {
+            showingAbout -> showingAbout = false
             readingManga != null -> {
                 readingManga = null
                 readingChapter = null
@@ -103,6 +107,7 @@ fun MangaReaderApp(viewModel: AppViewModel) {
 
     val destination = when {
         viewModel.isFirstLaunch -> AppDestination(AppScreen.ONBOARDING)
+        showingAbout -> AppDestination(AppScreen.ABOUT)
         readingManga != null -> AppDestination(
             screen = AppScreen.READER,
             manga = readingManga?.normalizedForAnimation(),
@@ -154,6 +159,8 @@ fun MangaReaderApp(viewModel: AppViewModel) {
                     onFinished = { /* viewModel.isFirstLaunch set to false */ }
                 )
 
+                AppScreen.ABOUT -> AboutScreen(onBack = ::returnToPreviousDestination)
+
                 AppScreen.READER -> {
                     val manga = target.manga ?: return@AnimatedContent
                     val chapter = target.chapter ?: ChapterItem("Chapter 1", manga.sourceUrl)
@@ -191,14 +198,12 @@ fun MangaReaderApp(viewModel: AppViewModel) {
                             {
                                 isBackNavigation = false
                                 readingChapter = next
-                                viewModel.readChapter(manga, next)
                             }
                         },
                         onPrevChapter = previousChapter?.let { previous ->
                             {
                                 isBackNavigation = true
                                 readingChapter = previous
-                                viewModel.readChapter(manga, previous)
                             }
                         }
                     )
@@ -251,8 +256,11 @@ fun MangaReaderApp(viewModel: AppViewModel) {
                     feedViewModel = exploreViewModel,
                     selectedTab = selectedTab,
                     scrollToTopSignal = tabScrollSignal,
-                    isBackNavigation = isBackNavigation,
                     onSelectTab = ::selectTab,
+                    onOpenAbout = {
+                        isBackNavigation = false
+                        showingAbout = true
+                    },
                     stateHolder = tabStateHolder,
                     onMangaClick = { manga ->
                         isBackNavigation = false
@@ -270,8 +278,8 @@ private fun MainTabs(
     feedViewModel: ExploreViewModel,
     selectedTab: Int,
     scrollToTopSignal: Int,
-    isBackNavigation: Boolean,
     onSelectTab: (Int) -> Unit,
+    onOpenAbout: () -> Unit,
     stateHolder: androidx.compose.runtime.saveable.SaveableStateHolder,
     onMangaClick: (MockManga) -> Unit
 ) {
@@ -305,12 +313,13 @@ private fun MainTabs(
                 },
             targetState = selectedTab,
             transitionSpec = {
+                val direction = if (targetState > initialState) 1 else -1
                 (fadeIn(tween(140)) + slideInHorizontally(
                     tween(180)
-                ) { if (isBackNavigation) -it / 5 else it / 5 }) togetherWith
+                ) { it * direction / 5 }) togetherWith
                     (fadeOut(tween(110)) + slideOutHorizontally(
                         tween(160)
-                    ) { if (isBackNavigation) it / 8 else -it / 8 })
+                    ) { -it * direction / 8 })
             },
             label = "main-tab-transition"
         ) { tab ->
@@ -324,7 +333,11 @@ private fun MainTabs(
                         onSourceClick = { source -> viewModel.openCatalog(source) }
                     )
                     1 -> LibraryScreen(viewModel, onMangaClick, scrollToTopSignal)
-                    2 -> SettingsScreen(viewModel, scrollToTopSignal)
+                    2 -> SettingsScreen(
+                        viewModel = viewModel,
+                        scrollToTopSignal = scrollToTopSignal,
+                        onOpenAbout = onOpenAbout
+                    )
                     3 -> ProfileScreen(viewModel, scrollToTopSignal)
                 }
             }

@@ -70,6 +70,7 @@ import com.hirojonn.bedduu.ui.ExploreViewModel
 import com.hirojonn.bedduu.ui.MockManga
 import com.hirojonn.bedduu.ui.components.CoverArt
 import com.hirojonn.bedduu.ui.theme.BedduuTokens
+import com.hirojonn.bedduu.ui.designsystem.BedduuDisplayFontFamily
 import com.hirojonn.bedduu.ui.theme.PrimaryLight
 import com.hirojonn.bedduu.ui.theme.SurfaceColor
 import com.hirojonn.bedduu.ui.theme.SurfaceVariant
@@ -162,7 +163,8 @@ fun ExploreScreen(
                 "Find your next read",
                 color = TextMain,
                 fontSize = 26.sp,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.ExtraBold,
+                fontFamily = BedduuDisplayFontFamily
             )
             Spacer(Modifier.height(16.dp))
             Surface(

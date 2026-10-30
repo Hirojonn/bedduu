@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hirojonn.bedduu.ui.screens.MangaDetailsChapterSelectionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-30T06:59:29" hostname="DESKTOP-JPOUDNF" time="0.018">
+  <properties/>
+  <testcase name="firstReadingChapterSelectsLowestNumberWhenNewestIsFirst" classname="com.hirojonn.bedduu.ui.screens.MangaDetailsChapterSelectionTest" time="0.011"/>
+  <testcase name="firstReadingChapterUsesOldestSourceEntryWhenTitlesAreUnnumbered" classname="com.hirojonn.bedduu.ui.screens.MangaDetailsChapterSelectionTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

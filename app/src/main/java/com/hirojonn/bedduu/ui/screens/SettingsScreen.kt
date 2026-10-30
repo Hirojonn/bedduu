@@ -1,14 +1,9 @@
 package com.hirojonn.bedduu.ui.screens
 
-import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,65 +13,40 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BookmarkRemove
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.CleaningServices
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import com.hirojonn.bedduu.ui.designsystem.BedduuDisplayFontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import com.hirojonn.bedduu.BuildConfig
-import com.hirojonn.bedduu.R
 import com.hirojonn.bedduu.ui.AppViewModel
-import com.hirojonn.bedduu.ui.ExtensionReleaseUpdates
-import kotlinx.coroutines.launch
-import java.io.IOException
 import com.hirojonn.bedduu.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     viewModel: AppViewModel,
+    onOpenAbout: () -> Unit,
     scrollToTopSignal: Int = 0,
     onBack: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-    val scope = rememberCoroutineScope()
 
     var showResetStatsDialog   by remember { mutableStateOf(false) }
     var showClearBookmarksDialog by remember { mutableStateOf(false) }
-    var releaseCheckStatus by remember {
-        mutableStateOf("Checks for new releases from Keiyoushi.")
-    }
     LaunchedEffect(scrollToTopSignal) {
         if (scrollToTopSignal > 0) scrollState.animateScrollTo(0)
-    }
-
-    val releaseNotificationPermission = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            viewModel.releaseNotificationsEnabled = true
-            viewModel.savePreferences()
-            ExtensionReleaseUpdates.schedule(context, enabled = true)
-        } else {
-            Toast.makeText(context, "Allow notifications to receive release alerts.", Toast.LENGTH_LONG).show()
-        }
     }
 
     // ── Dialogs ─────────────────────────────────────────────────────────────
@@ -152,6 +122,7 @@ fun SettingsScreen(
             fontSize = 27.sp,
             fontWeight = FontWeight.ExtraBold,
             color = TextMain,
+            fontFamily = BedduuDisplayFontFamily,
             modifier = Modifier.padding(start = 20.dp, top = 4.dp, bottom = 18.dp)
         )
 
@@ -276,80 +247,6 @@ fun SettingsScreen(
         }
 
         Spacer(Modifier.height(20.dp))
-        SectionHeader("Extensions & Updates")
-
-        SettingToggle(
-            title = "Keiyoushi Release Alerts",
-            subtitle = "Notify when extensions-source publishes a new GitHub release",
-            checked = viewModel.releaseNotificationsEnabled
-        ) { enabled ->
-            if (!enabled) {
-                viewModel.releaseNotificationsEnabled = false
-                viewModel.savePreferences()
-                ExtensionReleaseUpdates.schedule(context, enabled = false)
-            } else if (
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                releaseNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-            } else {
-                viewModel.releaseNotificationsEnabled = true
-                viewModel.savePreferences()
-                ExtensionReleaseUpdates.schedule(context, enabled = true)
-            }
-        }
-
-        Text(
-            releaseCheckStatus,
-            fontSize = 12.sp,
-            color = TextMuted,
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-        )
-
-        SettingActionRow(
-            icon = Icons.Default.RestartAlt,
-            title = "Check for extension releases",
-            subtitle = "Check the repository now",
-            actionLabel = "Check",
-            onClick = {
-                scope.launch {
-                    releaseCheckStatus = "Checking GitHub for the latest release…"
-                    try {
-                        releaseCheckStatus = when (
-                            val result = ExtensionReleaseUpdates.check(
-                                context.applicationContext,
-                                notifyOnNewRelease = viewModel.releaseNotificationsEnabled
-                            )
-                        ) {
-                            ExtensionReleaseUpdates.CheckResult.NoReleases ->
-                                "No GitHub releases have been published yet."
-                            is ExtensionReleaseUpdates.CheckResult.TrackingStarted ->
-                                "Watching releases. Latest: ${result.release.tag}"
-                            is ExtensionReleaseUpdates.CheckResult.ReleaseAvailable ->
-                                "New release: ${result.release.tag}"
-                            is ExtensionReleaseUpdates.CheckResult.UpToDate ->
-                                "Up to date: ${result.release.tag}"
-                        }
-                    } catch (error: IOException) {
-                        releaseCheckStatus = "Could not check releases: ${error.message ?: "network error"}"
-                        Toast.makeText(context, releaseCheckStatus, Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        )
-
-        SettingActionRow(
-            icon = Icons.Default.Code,
-            title = "Keiyoushi extensions-source",
-            subtitle = "github.com/keiyoushi/extensions-source",
-            actionLabel = "Open",
-            onClick = { openWebPage(context, "https://github.com/keiyoushi/extensions-source") }
-        )
-
-        Spacer(Modifier.height(20.dp))
 
         // ─── Data & Storage Actions ───────────────────────────────────────
         SectionHeader("Data & Storage")
@@ -386,49 +283,13 @@ fun SettingsScreen(
         // ─── About ────────────────────────────────────────────────────────
         SectionHeader("About")
 
-        BedduuCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 4.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.elf_peek),
-                        contentDescription = "bedduu Logo",
-                        modifier = Modifier
-                            .size(52.dp)
-                            .clip(CircleShape)
-                            .border(1.5.dp, PrimaryLight, CircleShape)
-                    )
-                    Spacer(Modifier.width(16.dp))
-                    Column {
-                        Text("bedduu", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextMain)
-                        Text("Version ${BuildConfig.VERSION_NAME} • Pure Anime Experience", fontSize = 12.sp, color = TextMuted)
-                    }
-                }
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = stringResource(R.string.about_description),
-                    fontSize = 13.sp,
-                    lineHeight = 19.sp,
-                    color = TextMuted
-                )
-            }
-        }
-
         SettingActionRow(
-            icon = Icons.Default.Person,
-            title = "Author",
-            subtitle = "Hirojonn",
+            icon = Icons.Default.Info,
+            title = "About Bedduu",
+            subtitle = "Terms of use and manga sources",
             actionLabel = "Open",
-            onClick = { openWebPage(context, "https://github.com/Hirojonn") }
+            onClick = onOpenAbout
         )
-
-        SettingInfoRow("Active Sources", "5 sources available")
 
         Spacer(Modifier.height(120.dp))
     }

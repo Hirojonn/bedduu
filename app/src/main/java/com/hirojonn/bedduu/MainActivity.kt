@@ -8,14 +8,23 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.SideEffect
+import androidx.lifecycle.lifecycleScope
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.hirojonn.bedduu.ui.MangaReaderApp
 import com.hirojonn.bedduu.ui.AppViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val viewModel: AppViewModel by viewModels()
     private lateinit var insetsController: WindowInsetsControllerCompat
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            viewModel.checkBookmarkedChapterUpdates(applicationContext)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

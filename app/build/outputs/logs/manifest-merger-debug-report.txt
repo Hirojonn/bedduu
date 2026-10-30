@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:2:1-30:12
-INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:2:1-30:12
-INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:2:1-30:12
-INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:2:1-30:12
+ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:2:1-29:12
+INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:2:1-29:12
+INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:2:1-29:12
+INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:2:1-29:12
 MERGED from [com.google.accompanist:accompanist-systemuicontroller:0.32.0] C:\Users\Jonn_\.gradle\caches\8.11.1\transforms\b791d3ab0779aaaf43a6d88435e1f2ce\transformed\accompanist-systemuicontroller-0.32.0\AndroidManifest.xml:17:1-23:12
 MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\Jonn_\.gradle\caches\8.11.1\transforms\1efbfee04f379909a7db7b770235fd47\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.compose.material3:material3:1.1.2] C:\Users\Jonn_\.gradle\caches\8.11.1\transforms\f9e4c3779187d074de4896daa64e9907\transformed\material3-1.1.2\AndroidManifest.xml:17:1-22:12
@@ -89,13 +89,9 @@ MERGED from [com.squareup.okhttp3:okhttp-android:5.1.0] C:\Users\Jonn_\.gradle\c
 MERGED from [com.squareup.okhttp3:okhttp-android:5.1.0] C:\Users\Jonn_\.gradle\caches\8.11.1\transforms\b450ed3942cd9a6e0f647fb69d1c19f4\transformed\okhttp-release\AndroidManifest.xml:8:5-67
 	android:name
 		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:3:22-64
-uses-permission#android.permission.POST_NOTIFICATIONS
-ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:4:5-77
-	android:name
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:4:22-74
 application
-ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:5:5-29:19
-INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:5:5-29:19
+ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:4:5-28:19
+INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:4:5-28:19
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\Jonn_\.gradle\caches\8.11.1\transforms\2756a822c00461ab68d22b46910d68b4\transformed\work-runtime-2.9.0\AndroidManifest.xml:28:5-143:19
 MERGED from [androidx.work:work-runtime:2.9.0] C:\Users\Jonn_\.gradle\caches\8.11.1\transforms\2756a822c00461ab68d22b46910d68b4\transformed\work-runtime-2.9.0\AndroidManifest.xml:28:5-143:19
 MERGED from [androidx.emoji2:emoji2:1.4.0] C:\Users\Jonn_\.gradle\caches\8.11.1\transforms\ab4256dd9933736cc8b984ab6488434d\transformed\emoji2-1.4.0\AndroidManifest.xml:23:5-33:19
@@ -119,49 +115,49 @@ MERGED from [androidx.startup:startup-runtime:1.2.0] C:\Users\Jonn_\.gradle\cach
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] C:\Users\Jonn_\.gradle\caches\8.11.1\transforms\30e5dd8e69c5814fe99b63652c477cc4\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:11:9-35
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:10:9-35
 	android:label
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:10:9-41
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:9:9-41
 	android:roundIcon
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:9:9-50
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:8:9-50
 	android:icon
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:8:9-45
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:7:9-45
 	android:allowBackup
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:6:9-35
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:5:9-35
 	android:theme
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:12:9-49
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:11:9-49
 	android:usesCleartextTraffic
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:7:9-44
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:6:9-44
 activity#com.hirojonn.bedduu.MainActivity
-ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:13:9-18:20
+ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:12:9-17:20
 	android:label
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:16:13-45
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:15:13-45
 	android:exported
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:15:13-37
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:14:13-37
 	android:theme
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:17:13-53
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:16:13-53
 	android:name
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:14:13-60
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:13:13-60
 activity#com.hirojonn.bedduu.SplashActivity
-ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:19:9-28:20
+ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:18:9-27:20
 	android:label
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:22:13-45
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:21:13-45
 	android:exported
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:21:13-36
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:20:13-36
 	android:theme
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:23:13-60
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:22:13-60
 	android:name
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:20:13-62
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:19:13-62
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:24:13-27:29
+ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:23:13-26:29
 action#android.intent.action.MAIN
-ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:25:17-69
+ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:24:17-69
 	android:name
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:25:25-66
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:24:25-66
 category#android.intent.category.LAUNCHER
-ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:26:17-77
+ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:25:17-77
 	android:name
-		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:26:27-74
+		ADDED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml:25:27-74
 uses-sdk
 INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from E:\bedduu-manhwa\app\src\main\AndroidManifest.xml

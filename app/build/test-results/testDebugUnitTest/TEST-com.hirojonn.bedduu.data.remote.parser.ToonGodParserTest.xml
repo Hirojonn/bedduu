@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hirojonn.bedduu.data.remote.parser.ToonGodParserTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-30T06:59:29" hostname="DESKTOP-JPOUDNF" time="0.068">
+  <properties/>
+  <testcase name="parses singular webtoon routes lazy covers and excludes chapter links" classname="com.hirojonn.bedduu.data.remote.parser.ToonGodParserTest" time="0.066"/>
+  <testcase name="empty or changed markup reports a parser error" classname="com.hirojonn.bedduu.data.remote.parser.ToonGodParserTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
